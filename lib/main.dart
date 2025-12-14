@@ -9,94 +9,99 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: LoginPage());
+    return MaterialApp(home: MainScreen());
   }
 }
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final formKey = GlobalKey<FormState>();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
+class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Форма входа")),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Введите email";
-                  }
-                  if (!value.contains("@")) {
-                    return "Email должен содержать @";
-                  }
-                  return null;
-                },
+      appBar: AppBar(title: const Text('Main Screen')),
+      body: Center(
+        child: ElevatedButton(
+          child: const Text('Открыть детали'),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    DetailsScreen(detailText: 'Привет из MainScreen'),
               ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
 
-              SizedBox(height: 20),
+class DetailsScreen extends StatelessWidget {
+  final String detailText;
 
-              TextFormField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: "Пароль",
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Введите пароль";
-                  }
-                  if (value.length < 6) {
-                    return "Минимум 6 символов";
-                  }
-                  return null;
-                },
-              ),
+  const DetailsScreen({super.key, required this.detailText});
 
-              SizedBox(height: 20),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Details Screen')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(detailText, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 20),
 
-              ElevatedButton(
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text("Успешный вход!")));
+            ElevatedButton(
+              child: const Text('Открыть настройки'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
+              },
+            ),
 
-                    emailController.clear();
-                    passwordController.clear();
-                  }
-                },
-                child: Text("Войти"),
-              ),
-            ],
-          ),
+            const SizedBox(height: 20),
+
+            ElevatedButton(
+              child: const Text('Назад'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Settings')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Настройки', style: TextStyle(fontSize: 20)),
+            const SizedBox(height: 20),
+
+            ElevatedButton(
+              child: const Text('Назад'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
         ),
       ),
     );
