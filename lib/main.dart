@@ -9,100 +9,41 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: MainScreen());
+    return const MaterialApp(home: TasksListScreen());
   }
 }
 
-class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+class TasksListScreen extends StatelessWidget {
+  const TasksListScreen({super.key});
+
+  final List<String> tasks = const ['Задача 1', 'Задача 2', 'Задача 3'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Main Screen')),
-      body: Center(
-        child: ElevatedButton(
-          child: const Text('Открыть детали'),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    DetailsScreen(detailText: 'Привет из MainScreen'),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
+      appBar: AppBar(title: const Text('Список задач')),
+      body: ListView.separated(
+        itemCount: tasks.length,
 
-class DetailsScreen extends StatelessWidget {
-  final String detailText;
+        separatorBuilder: (context, index) {
+          return const Divider();
+        },
 
-  const DetailsScreen({super.key, required this.detailText});
+        itemBuilder: (context, index) {
+          return ListTile(
+            leading: const Icon(Icons.check_box_outline_blank),
+            title: Text(tasks[index]),
+            onTap: () {
+              // Вариант 1: print
+              print(tasks[index]);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Details Screen')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(detailText, style: const TextStyle(fontSize: 20)),
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              child: const Text('Открыть настройки'),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SettingsScreen(),
-                  ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              child: const Text('Назад'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Настройки', style: TextStyle(fontSize: 20)),
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              child: const Text('Назад'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
+              // Вариант 2: SnackBar
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Вы выбрали: ${tasks[index]}')),
+              );
+            },
+          );
+        },
       ),
     );
   }
