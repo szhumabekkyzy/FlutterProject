@@ -1,49 +1,89 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
+/// ---------- MODEL ----------
+class CounterModel {
+  int counter = 0;
+
+  Future<void> loadCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    counter = prefs.getInt('counter') ?? 0;
+  }
+
+  Future<void> saveCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('counter', counter);
+  }
+
+  Future<void> increment() async {
+    counter++;
+    await saveCounter();
+  }
+}
+
+/// ---------- APP ----------
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: TasksListScreen());
+    return const MaterialApp(home: CounterPage());
   }
 }
 
-class TasksListScreen extends StatelessWidget {
-  const TasksListScreen({super.key});
+/// ---------- PAGE ----------
+class CounterPage extends StatefulWidget {
+  const CounterPage({super.key});
 
-  final List<String> tasks = const ['Задача 1', 'Задача 2', 'Задача 3'];
+  @override
+  State<CounterPage> createState() => _CounterPageState();
+}
+
+class _CounterPageState extends State<CounterPage> {
+  final CounterModel counterModel = CounterModel();
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  Future<void> loadData() async {
+    await counterModel.loadCounter();
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Список задач')),
-      body: ListView.separated(
-        itemCount: tasks.length,
-
-        separatorBuilder: (context, index) {
-          return const Divider();
-        },
-
-        itemBuilder: (context, index) {
-          return ListTile(
-            leading: const Icon(Icons.check_box_outline_blank),
-            title: Text(tasks[index]),
-            onTap: () {
-              // Вариант 1: print
-              print(tasks[index]);
-
-              // Вариант 2: SnackBar
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Вы выбрали: ${tasks[index]}')),
-              );
-            },
-          );
-        },
+      appBar: AppBar(title: const Text('Счётчик')),
+      body: Center(
+        child: isLoading
+            ? const CircularProgressIndicator()
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Значение: ${counterModel.counter}',
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await counterModel.increment();
+                      setState(() {});
+                    },
+                    child: const Text('Увеличить'),
+                  ),
+                ],
+              ),
       ),
     );
   }
